@@ -1,69 +1,77 @@
-# Solarized theme for sddm
+# Solarized theme for SDDM
 
-This theme is inspired by Numix sddm theme
+This theme is a fork of [MalditoBarbudo/solarized\_sddm\_theme](https://github.com/MalditoBarbudo/solarized_sddm_theme).
+The code is updated to support recent `SDDM` versions (tested with `0.21.0`).
+
+It is initially inspired by the Numix SDDM theme
 ([https://github.com/intialonso/intialonso.github.io](https://github.com/intialonso/intialonso.github.io/tree/master/themes/sddm/numix))
-by Inti Alonso and the default sddm theme, maui ([https://github.com/sddm/sddm](https://github.com/sddm/sddm)).
-Wallpaper was created using [inkscape](https://inkscape.org).
-It also uses some icons from Numix icon theme
-[https://github.com/numixproject/numix-icon-theme](https://github.com/numixproject/numix-icon-theme)
-(shutdown, warning and down arrow icons).  
-QML files contain license headers.  
+by Inti Alonso and the default SDDM theme, Maui ([https://github.com/sddm/sddm](https://github.com/sddm/sddm)).
+
+The wallpaper was created using [Inkscape](https://inkscape.org).
+It also uses some icons from the Numix icon theme
+([https://github.com/numixproject/numix-icon-theme](https://github.com/numixproject/numix-icon-theme))
+(shutdown, warning, and down arrow icons).
+
+QML files contain license headers.
 
 ## Aim
-The aim of this theme is to display a simple yet complete sddm greeter based in
-solarized palette by Ethan Schoonover
-([http://ethanschoonover.com/solarized](http://ethanschoonover.com/solarized)).  
-I use this colors almost everywhere so, why not in the greeter? ;)
+
+The aim of this theme is to display a simple yet complete `SDDM` greeter based on
+the Solarized palette by Ethan Schoonover
+([http://ethanschoonover.com/solarized](http://ethanschoonover.com/solarized)).
+
+I use these colors almost everywhere, so why not in the greeter? ;)
 
 ## Dependencies
-This theme relies in `Fontawesome` font. If you try this, make sure that it is
-installed in your system. In archlinux this font can be installed from aur:  
 
-- [ttf-font-awesome](https://aur.archlinux.org/packages/ttf-font-awesome)  
+This theme relies on the `FontAwesome` font. If you try this, make sure it is
+installed on your system. On Arch Linux, this font can be installed from the AUR:
+
+* [ttf-font-awesome](https://aur.archlinux.org/packages/ttf-font-awesome)
 
 ## Installation
 
 ### Stable version
 
-#### Archlinux
+#### Arch Linux
 
-Theme can be installed from `solarized-sddm-theme`
-[aur package](https://aur.archlinux.org/packages/solarized-sddm-theme/). This
+The theme can be installed from the `solarized-sddm-theme`
+[AUR package](https://aur.archlinux.org/packages/solarized-sddm-theme/). This
 package contains the latest stable version.
 
-#### Other linux distributions
+#### Other Linux distributions
 
-  > This theme has only been tested in archlinux. Theme should work in other
-    distributions like fedora or ubuntu, though, but use it at your own risk.
+> This theme has only been tested on Arch Linux. It should work on other
+> distributions like Fedora or Ubuntu, but use it at your own risk.
 
-For installing in other linux distributions you must get the latest stable version
-from [github](https://github.com/MalditoBarbudo/solarized_sddm_theme/releases)
-(`0.1.8` at the moment of writing):
+To install on other Linux distributions, you must get the latest stable version
+from [GitHub](https://github.com/MalditoBarbudo/solarized_sddm_theme/releases)
+(`0.1.8` at the time of writing):
 
 ```
 # this command will download and untar the package
 wget --no-check-certificate https://github.com/MalditoBarbudo/solarized_sddm_theme/archive/0.1.6.tar.gz -O - | tar xz
 ```
 
-and copy the created theme folder to `/usr/share/sddm/themes`.
+Then copy the created theme folder to `/usr/share/sddm/themes`.
 Finally, don't forget to change the theme in `/etc/sddm.conf`.
 
 ## Fonts
 
-This theme uses by default `Raleway` font. If `Raleway` is not installed
-default sddm font is used. `Raleway` can be installed on arch from aur:
+This theme uses the `Raleway` font by default. If `Raleway` is not installed,
+the default `SDDM` font is used. `Raleway` can be installed on Arch Linux from the AUR:
 
-- [otf-raleway](https://aur.archlinux.org/packages/otf-raleway/)  
-- `Raleway` also can be installed from
-  [ttf-google-fonts-git](https://aur.archlinux.org/packages/ttf-google-fonts-git/)
+* [otf-raleway](https://aur.archlinux.org/packages/otf-raleway/)
+* `Raleway` can also be installed from
+  [ttf-google-fonts-git](https://aur.archlinux.org/packages/ttf-google-fonts-git/),
   which also installs other cool fonts.
 
 #### Changing font in `theme.conf`:
-If you want to try different fonts, or just use the
-one you love, or simply setting one really installed in your system you can
-modify the displayFont field in the`theme.conf` file (in the theme folder,
-usually in `/usr/share/sddm/themes/solarized-sddm-theme/` if installed from aur)
-with your exclusive font selection. For example, to change to Montserrat font:
+
+If you want to try different fonts, use your favorite font, or just specify one
+that is installed on your system, you can modify the `displayFont` field in the
+`theme.conf` file (in the theme folder, usually `/usr/share/sddm/themes/solarized-sddm-theme/` if installed from AUR).
+For example, to change to Montserrat font:
 
 ```
 [General]
@@ -71,18 +79,13 @@ background=background.png
 displayFont="Montserrat"
 ```
 
-But be careful, some fonts really don't mix well with the theme.
+But be careful, some fonts don't mix well with the theme.
 
 ## Screenshot (2019-01-03)
 
 ![screenshot](solarized_sddm_theme.png)
 
-## Known Issues
-
-1. Multimonitor issues. In some multimonitor configurations it may appear some
-   glitches in the theme. Working on it.
-
 ## License
 
-Theme is licensed under GPL.  
+The theme is licensed under the GPL.
 QML files are MIT licensed.
