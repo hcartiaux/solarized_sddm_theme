@@ -84,6 +84,8 @@ Rectangle {
                 if (!layoutBox.visible && !btnReboot.visible && !btnShutdown.visible) {
                     root.requestLoginFocusFirst()
                     event.accepted = true
+                } else {
+                    event.accepted = false
                 }
             }
             Keys.onBacktabPressed: function(event) {
@@ -153,6 +155,8 @@ Rectangle {
                 if (!btnReboot.visible && !btnShutdown.visible) {
                     root.requestLoginFocusFirst()
                     event.accepted = true
+                } else {
+                    event.accepted = false
                 }
             }
             KeyNavigation.backtab: session
@@ -189,6 +193,8 @@ Rectangle {
                 if (!btnShutdown.visible) {
                     root.requestLoginFocusFirst()
                     event.accepted = true
+                } else {
+                    event.accepted = false
                 }
             }
             KeyNavigation.backtab: layoutBox.visible ? layoutBox : session
