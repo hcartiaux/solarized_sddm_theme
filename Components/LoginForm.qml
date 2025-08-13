@@ -10,11 +10,10 @@ Rectangle {
     property QtObject layout
     property string themeRoot
 
-    // Navigation signals
-    signal focusNext()
-    signal focusPrevious()
-    signal loginAttempt(string username, string password, int sessionIndex)
-    signal requestActionBarFocus()
+    // Navigation signals for wrapping focus
+    signal requestActionBarFocusFirst()
+    signal requestActionBarFocusLast()
+    signal loginAttempt(string username, string password)
 
     // Public API for external focus management
     function focusUsername() {
@@ -34,6 +33,9 @@ Rectangle {
         name.forceActiveFocus()
     }
 
+    function focusLast() {
+        loginButton.forceActiveFocus()
+    }
 
     function showError(message) {
         errorMessage.text = message
@@ -43,40 +45,6 @@ Rectangle {
     function clearError() {
         errorMessage.text = textConstants.prompt
         errorMessage.color = theme.colors.textColor
-    }
-
-    // Focus order: username -> password -> login button
-    property var focusOrder: [name, password, loginButton]
-
-    function focusNextInOrder() {
-        var currentIndex = getCurrentFocusIndex()
-        var nextIndex = (currentIndex + 1) % focusOrder.length
-
-        // If we're at the last item, signal to move to next component
-        if (currentIndex === focusOrder.length - 1) {
-            root.focusNext()
-        } else {
-            focusOrder[nextIndex].forceActiveFocus()
-        }
-    }
-
-    function focusPreviousInOrder() {
-        var currentIndex = getCurrentFocusIndex()
-        if (currentIndex === 0) {
-            // Signal to move to previous component (action bar)
-            root.requestActionBarFocus()
-        } else {
-            focusOrder[currentIndex - 1].forceActiveFocus()
-        }
-    }
-
-    function getCurrentFocusIndex() {
-        for (var i = 0; i < focusOrder.length; i++) {
-            if (focusOrder[i].activeFocus) {
-                return i
-            }
-        }
-        return 0 // Default to first item
     }
 
     color: "transparent"
@@ -122,19 +90,23 @@ Rectangle {
                 borderColor: "transparent"
                 textColor: theme.colors.textColor
 
-                // Input handling
-                Keys.onPressed: function(event) {
-                    if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
-                        root.loginAttempt(name.text, password.text, sessionModel.lastIndex)
-                        event.accepted = true
-                    } else if (event.key === Qt.Key_Tab) {
-                        root.focusNextInOrder()
-                        event.accepted = true
-                    } else if (event.key === Qt.Key_Backtab) {
-                        root.focusPreviousInOrder()
-                        event.accepted = true
-                    }
+                // Key Navigation
+                KeyNavigation.tab: password
+                Keys.onBacktabPressed: function(event) {
+                    root.requestActionBarFocusLast()
+                    event.accepted = true
                 }
+
+                // Input handling
+                Keys.onEnterPressed: function(event) {
+                    root.loginAttempt(name.text, password.text)
+                    event.accepted = true
+                }
+                Keys.onReturnPressed: function(event) {
+                    root.loginAttempt(name.text, password.text)
+                    event.accepted = true
+                }
+
 
                 onTextChanged: root.clearError()
             }
@@ -190,18 +162,18 @@ Rectangle {
                 borderColor: "transparent"
                 textColor: theme.colors.textColor
 
+                // Key Navigation
+                KeyNavigation.tab: loginButton
+                KeyNavigation.backtab: name
+
                 // Input handling
-                Keys.onPressed: function(event) {
-                    if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
-                        root.loginAttempt(name.text, password.text, sessionModel.lastIndex)
-                        event.accepted = true
-                    } else if (event.key === Qt.Key_Tab) {
-                        root.focusNextInOrder()
-                        event.accepted = true
-                    } else if (event.key === Qt.Key_Backtab) {
-                        root.focusPreviousInOrder()
-                        event.accepted = true
-                    }
+                Keys.onEnterPressed: function(event) {
+                    root.loginAttempt(name.text, password.text)
+                    event.accepted = true
+                }
+                Keys.onReturnPressed: function(event) {
+                    root.loginAttempt(name.text, password.text)
+                    event.accepted = true
                 }
 
                 onTextChanged: root.clearError()
@@ -229,21 +201,24 @@ Rectangle {
                 // Interaction
                 onClicked: {
                     console.log("Login button clicked")
-                    root.loginAttempt(name.text, password.text, sessionModel.lastIndex)
+                    root.loginAttempt(name.text, password.text)
+                }
+
+                // Key Navigation
+                KeyNavigation.backtab: password
+                Keys.onTabPressed: function(event) {
+                    root.requestActionBarFocusFirst()
+                    event.accepted = true
                 }
 
                 // Navigation
-                Keys.onPressed: function(event) {
-                    if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
-                        root.loginAttempt(name.text, password.text, sessionModel.lastIndex)
-                        event.accepted = true
-                    } else if (event.key === Qt.Key_Tab) {
-                        root.focusNextInOrder()
-                        event.accepted = true
-                    } else if (event.key === Qt.Key_Backtab) {
-                        root.focusPreviousInOrder()
-                        event.accepted = true
-                    }
+                Keys.onEnterPressed: function(event) {
+                    root.loginAttempt(name.text, password.text)
+                    event.accepted = true
+                }
+                Keys.onReturnPressed: function(event) {
+                    root.loginAttempt(name.text, password.text)
+                    event.accepted = true
                 }
 
                 // Visual feedback

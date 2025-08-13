@@ -10,63 +10,29 @@ Rectangle {
     property QtObject layout
     property string themeRoot
 
-    // Navigation signals
-    signal focusNext()
-    signal focusPrevious()
-    signal requestLoginFocus()
+    // Navigation signals for wrapping focus
+    signal requestLoginFocusFirst()
+    signal requestLoginFocusLast()
 
     // Public API for external focus management
     function focusSession() {
         session.forceActiveFocus()
     }
 
+    function focusLast() {
+        if (btnShutdown.visible) {
+            btnShutdown.forceActiveFocus()
+        } else if (btnReboot.visible) {
+            btnReboot.forceActiveFocus()
+        } else if (layoutBox.visible) {
+            layoutBox.forceActiveFocus()
+        } else {
+            session.forceActiveFocus()
+        }
+    }
+
     function getSessionIndex() {
         return session.index
-    }
-
-    // Focus order management - left to right, top to bottom
-    property var focusOrder: {
-        var order = [session]
-        if (layoutBox.visible) {
-            order.push(layoutBox)
-        }
-        if (btnReboot.visible) {
-            order.push(btnReboot)
-        }
-        if (btnShutdown.visible) {
-            order.push(btnShutdown)
-        }
-        return order
-    }
-
-    function focusNextInOrder() {
-        var currentIndex = getCurrentFocusIndex()
-        var nextIndex = (currentIndex + 1) % focusOrder.length
-
-        // If we're at the last item, signal to move to login form
-        if (currentIndex === focusOrder.length - 1) {
-            root.requestLoginFocus()
-        } else {
-            focusOrder[nextIndex].forceActiveFocus()
-        }
-    }
-
-    function focusPreviousInOrder() {
-        var currentIndex = getCurrentFocusIndex()
-        if (currentIndex === 0) {
-            root.requestLoginFocus()
-        } else {
-            focusOrder[currentIndex - 1].forceActiveFocus()
-        }
-    }
-
-    function getCurrentFocusIndex() {
-        for (var i = 0; i < focusOrder.length; i++) {
-            if (focusOrder[i].activeFocus) {
-                return i
-            }
-        }
-        return 0 // Default to first item
     }
 
     color: "transparent"
@@ -112,12 +78,17 @@ Rectangle {
                 pixelSize: theme.fonts.small
             }
 
-            // Navigation
-            Keys.onTabPressed: function() {
-                root.focusNextInOrder()
+            // Key Navigation
+            KeyNavigation.tab: layoutBox.visible ? layoutBox : (btnReboot.visible ? btnReboot : btnShutdown)
+            Keys.onTabPressed: function(event) {
+                if (!layoutBox.visible && !btnReboot.visible && !btnShutdown.visible) {
+                    root.requestLoginFocusFirst()
+                    event.accepted = true
+                }
             }
-            Keys.onBacktabPressed: function() {
-                root.focusPreviousInOrder()
+            Keys.onBacktabPressed: function(event) {
+                root.requestLoginFocusLast()
+                event.accepted = true
             }
         }
 
@@ -176,13 +147,15 @@ Rectangle {
                 }
             }
 
-            // Navigation
-            Keys.onTabPressed: function() {
-                root.focusNextInOrder()
+            // Key Navigation
+            KeyNavigation.tab: btnReboot.visible ? btnReboot : btnShutdown
+            Keys.onTabPressed: function(event) {
+                if (!btnReboot.visible && !btnShutdown.visible) {
+                    root.requestLoginFocusFirst()
+                    event.accepted = true
+                }
             }
-            Keys.onBacktabPressed: function() {
-                root.focusPreviousInOrder()
-            }
+            KeyNavigation.backtab: session
         }
     }
 
@@ -210,13 +183,15 @@ Rectangle {
                 sddm.reboot()
             }
 
-            // Navigation
-            Keys.onTabPressed: function() {
-                root.focusNextInOrder()
+            // Key Navigation
+            KeyNavigation.tab: btnShutdown
+            Keys.onTabPressed: function(event) {
+                if (!btnShutdown.visible) {
+                    root.requestLoginFocusFirst()
+                    event.accepted = true
+                }
             }
-            Keys.onBacktabPressed: function() {
-                root.focusPreviousInOrder()
-            }
+            KeyNavigation.backtab: layoutBox.visible ? layoutBox : session
 
             // Error handling
             onStatusChanged: {
@@ -240,13 +215,13 @@ Rectangle {
                 sddm.powerOff()
             }
 
-            // Navigation
-            Keys.onTabPressed: function() {
-                root.focusNextInOrder()
+            // Key Navigation
+            Keys.onTabPressed: function(event) {
+                root.requestLoginFocusFirst()
+                event.accepted = true
             }
-            Keys.onBacktabPressed: function() {
-                root.focusPreviousInOrder()
-            }
+            KeyNavigation.backtab: btnReboot.visible ? btnReboot : (layoutBox.visible ? layoutBox : session)
+
 
             // Error handling
             onStatusChanged: {

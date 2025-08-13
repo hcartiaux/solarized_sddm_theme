@@ -148,7 +148,10 @@ Rectangle {
         layout: container.layout
         themeRoot: container.themeRoot
 
-        onRequestLoginFocus: loginForm.focusNonInitial()
+        // Connect action bar requests to login form actions
+        onRequestLoginFocusFirst: loginForm.focusNonInitial()
+        onRequestLoginFocusLast: loginForm.focusLast()
+
         // Component initialization
         Component.onCompleted: {
             // Set initial focus based on username presence
@@ -210,12 +213,14 @@ Rectangle {
                 layout: container.layout
                 themeRoot: container.themeRoot
 
-                onFocusNext: actionBar.focusSession()
-                onLoginAttempt: function(username, password, sessionIndex) {
-                    container.loginAttempt(username, password, sessionIndex)
+                // Connect login form requests to action bar actions
+                onRequestActionBarFocusFirst: actionBar.focusSession()
+                onRequestActionBarFocusLast: actionBar.focusLast()
+
+                onLoginAttempt: function(username, password) {
+                    container.loginAttempt(username, password, actionBar.getSessionIndex())
                     sddm.login(username, password, actionBar.getSessionIndex())
                 }
-                onRequestActionBarFocus: actionBar.focusSession()
             }
         }
     }
