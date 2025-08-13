@@ -82,11 +82,11 @@ Rectangle {
             source: {
                 if (config.background && Qt.resolvedUrl(config.background).toString() !== "")
                     return config.background
-                return themeRoot + "background.png"
+                return themeRoot + "Backgrounds/background.png"
             }
             fillMode: Image.PreserveAspectCrop
-            onStatusChanged: if (status === Image.Error && source !== themeRoot + "background.png")
-                source = themeRoot + "background.png"
+            onStatusChanged: if (status === Image.Error && source !== themeRoot + "Backgrounds/background.png")
+                source = themeRoot + "Backgrounds/background.png"
         }
     }
 
@@ -116,7 +116,7 @@ Rectangle {
                 model: sessionModel; index: sessionModel.lastIndex
                 color: base03; textColor: yellow; borderColor: "transparent"
                 hoverColor: base02; arrowColor: base03
-                arrowIcon: themeRoot + "angle-down.svg"
+                arrowIcon: themeRoot + "Assets/angle-down.svg"
                 font { family: fontFamily; pixelSize: smallFontSize }
                 KeyNavigation.backtab: btnShutdown; KeyNavigation.tab: layoutBox
             }
@@ -168,7 +168,7 @@ Rectangle {
                 width: height
                 smooth: true
                 antialiasing: true
-                source: themeRoot + "reboot.svg"
+                source: themeRoot + "Assets/reboot.svg"
                 visible: sddm.canReboot
                 onClicked: sddm.reboot()
                 KeyNavigation.backtab: loginButton; KeyNavigation.tab: btnShutdown
@@ -180,7 +180,7 @@ Rectangle {
                 smooth: true
                 antialiasing: true
                 width: height
-                source: themeRoot + "shutdown.svg"
+                source: themeRoot + "Assets/shutdown.svg"
                 visible: sddm.canPowerOff
                 onClicked: sddm.powerOff()
                 KeyNavigation.backtab: btnReboot; KeyNavigation.tab: session
@@ -308,7 +308,7 @@ Rectangle {
                             height: parent.parent.height * 0.15
                             font { family: fontFamily; pixelSize: normalFontSize }
                             tooltipBG: base02; tooltipFG: red
-                            image: themeRoot + "warning_red.png"
+                            image: themeRoot + "Assets/warning_red.png"
                             color: base02
                             borderColor: "transparent"
                             textColor: base0
