@@ -2,6 +2,7 @@
 
 This theme is a fork of [MalditoBarbudo/solarized\_sddm\_theme](https://github.com/MalditoBarbudo/solarized_sddm_theme).
 The code is updated to support recent `SDDM` versions (tested with `0.21.0`).
+It has been extensively updated and refactored with the assistance of Large Language Models (LLMs).
 
 It is initially inspired by the Numix SDDM theme
 ([https://github.com/intialonso/intialonso.github.io](https://github.com/intialonso/intialonso.github.io/tree/master/themes/sddm/numix))
