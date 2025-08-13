@@ -30,50 +30,105 @@ import QtQuick.Layouts 1.15
 import QtQuick.Controls 2.15
 import QtQml 2.15
 import SddmComponents 2.0
+import "Components"
 
 Rectangle {
     id: container
-    readonly property color base0: "#839496"
-    readonly property color base3: "#fdf6e3"
-    readonly property color base02: "#073642"
-    readonly property color base03: "#002b36"
-    readonly property color blue: "#268bd2"
-    readonly property color cyan: "#2aa198"
-    readonly property color red: "#dc322f"
-    readonly property color yellow: "#b58900"
+
+    // Theme configuration object
+    readonly property QtObject theme: QtObject {
+        readonly property QtObject colors: QtObject {
+            readonly property color textColor:         "#839496"   // Primary text color
+            readonly property color lightBackground:   "#fdf6e3"   // Light backgrounds and button text
+            readonly property color darkBackground:    "#073642"   // Input fields and hover states
+            readonly property color primaryBackground: "#002b36"   // Main UI elements background
+            readonly property color accent:            "#268bd2"   // Primary action color (blue)
+            readonly property color accentHover:       "#2aa198"   // Accent hover state (cyan)
+            readonly property color warning:           "#dc322f"   // Error states and warnings
+            readonly property color highlight:         "#b58900"   // Icons and highlights (yellow)
+            readonly property color disabled:          "#586e75"   // Disabled state (base01 - muted)
+        }
+
+        readonly property QtObject fonts: QtObject {
+            property string family: config.displayFont || textFont.name
+            property int small:  Math.max(10, baseFontSize * scaleFactor * 0.8)
+            property int normal: Math.max(12, baseFontSize * scaleFactor)
+            property int large:  Math.max(16, baseFontSize * scaleFactor * 1.2)
+            property int clock:  Math.max(32, baseFontSize * scaleFactor * 5)
+            property int date:   Math.max(16, baseFontSize * scaleFactor * 2)
+            property int icon:   Math.max(12, baseFontSize * scaleFactor * 1)
+        }
+    }
+
+    // Layout configuration object
+    readonly property QtObject layout: QtObject {
+        readonly property real actionBarHeight: 0.05        // 5% of screen height
+        readonly property real rightPanelWidth: 0.4         // 40% of screen width
+        readonly property real clockHeight: 0.4             // 40% of right panel
+        readonly property real loginFormHeight: 0.5         // 50% of right panel
+        readonly property real standardSpacing: 0.01        // Standard spacing unit
+        readonly property real componentMargin: 0.01        // Standard margin
+        readonly property real sessionSelectorWidth: 0.15   // Session dropdown width
+        readonly property real layoutSelectorWidth: 0.035   // Layout dropdown width
+        readonly property real powerButtonSize: 0.3         // Power button size relative to bar
+
+        // ActionBar specific layouts
+        readonly property real comboBoxHeight: 0.6          // ComboBox height relative to bar
+
+        // LoginForm specific layouts
+        readonly property real formColumnSpacing: 0.08      // Vertical spacing in form columns
+        readonly property real formMargins: 0.05            // Form content margins
+        readonly property real inputFieldHeight: 0.15       // Input field height relative to form
+        readonly property real loginButtonHeight: 0.16      // Login button height relative to form
+        readonly property real loginButtonWidth: 0.7        // Login button width relative to column
+        readonly property real columnSplit: 0.48            // Each column takes 48% (with spacing)
+        readonly property real clockSpacingMultiplier: 5    // Clock spacing = standardSpacing * 5
+        readonly property real textIconSpacing: 0.08        // Text spacing in combo delegates
+    }
 
     LayoutMirroring.enabled: Qt.locale().textDirection === Qt.RightToLeft
     LayoutMirroring.childrenInherit: true
 
     property string themeRoot: Qt.resolvedUrl(".")
-    property string fontFamily: config.displayFont || textFont.name
 
     // Font sizing system
     property real scaleFactor: Math.min(width / 1024, height / 768)
-    readonly property int baseFontSize:   12
-    readonly property int smallFontSize:  Math.max(10, baseFontSize * scaleFactor * 0.8)
-    readonly property int normalFontSize: Math.max(12, baseFontSize * scaleFactor)
-    readonly property int largeFontSize:  Math.max(16, baseFontSize * scaleFactor * 1.2)
-    readonly property int clockFontSize:  Math.max(32, baseFontSize * scaleFactor * 5)
-    readonly property int dateFontSize:   Math.max(16, baseFontSize * scaleFactor * 2)
-    readonly property int iconFontSize:   Math.max(12, baseFontSize * scaleFactor * 1)
+    readonly property int baseFontSize: 12
+
+    // Navigation management
+    property Item currentFocusItem: null
+
+    signal focusNext()
+    signal focusPrevious()
+    signal loginAttempt(string username, string password, int sessionIndex)
 
     TextConstants { id: textConstants }
 
     FontLoader {
         id: textFont
-        source: config.displayFont ? (config.displayFont.includes('/') ? config.displayFont : themeRoot + config.displayFont + ".ttf") : themeRoot + "DejaVuSans.ttf"
-    }
-
-    Connections {
-        target: sddm
-        function onLoginFailed() {
-            errorMessage.color = red
-            errorMessage.text = textConstants.loginFailed
+        source: {
+            if (config.displayFont) {
+                return config.displayFont.includes('/') ?
+                    config.displayFont : themeRoot + config.displayFont + ".ttf"
+            }
+            return themeRoot + "DejaVuSans.ttf"
+        }
+        onStatusChanged: {
+            if (status === FontLoader.Error) {
+                console.warn("Failed to load custom font, using system default")
+            }
         }
     }
 
-    // Background for all screens
+    // Global error handling for login
+    Connections {
+        target: sddm
+        function onLoginFailed() {
+            loginForm.showError(textConstants.loginFailed)
+        }
+    }
+
+    // Background with error handling
     Repeater {
         model: screenModel
         Background {
@@ -82,264 +137,114 @@ Rectangle {
             source: {
                 if (config.background && Qt.resolvedUrl(config.background).toString() !== "")
                     return config.background
-                return themeRoot + "Backgrounds/background.png"
+                return container.themeRoot + "Backgrounds/background.png"
             }
             fillMode: Image.PreserveAspectCrop
-            onStatusChanged: if (status === Image.Error && source !== themeRoot + "Backgrounds/background.png")
-                source = themeRoot + "Backgrounds/background.png"
+            onStatusChanged: {
+                if (status === Image.Error) {
+                    console.warn("Failed to load background image:", source)
+                    if (source !== container.themeRoot + "Backgrounds/background.png") {
+                        source = container.themeRoot + "Backgrounds/background.png"
+                    }
+                }
+            }
         }
     }
 
-    // Top action bar with session and layout selectors + power buttons
-    Rectangle {
+    // Top action bar
+    ActionBar {
         id: actionBar
-        anchors { top: parent.top; left: parent.left; right: parent.right; margins: parent.width * 0.01 }
-        height: parent.height * 0.05
-        color: "transparent"
-
-        Row {
-            anchors { left: parent.left; verticalCenter: parent.verticalCenter }
-            height: parent.height
-            spacing: parent.width * 0.01
-
-            // Session selector
-            Text {
-                text: "\uF108"
-                font { family: fontFamily; pixelSize: iconFontSize; bold: true }
-                verticalAlignment: Text.AlignVCenter
-                color: yellow
-            }
-            ComboBox {
-                id: session
-                width: parent.parent.width * 0.15
-                height: parent.height * 0.6
-                model: sessionModel; index: sessionModel.lastIndex
-                color: base03; textColor: yellow; borderColor: "transparent"
-                hoverColor: base02; arrowColor: base03
-                arrowIcon: themeRoot + "Assets/angle-down.svg"
-                font { family: fontFamily; pixelSize: smallFontSize }
-                KeyNavigation.backtab: btnShutdown; KeyNavigation.tab: layoutBox
-            }
-
-            // Keyboard layout selector
-            Text {
-                text: "\uF11C"
-                font { family: fontFamily; pixelSize: iconFontSize; bold: true }
-                verticalAlignment: Text.AlignVCenter
-                color: yellow
-                visible: keyboard.layouts.count > 1 && (keyboard.layouts.count === 0 && keyboard.layouts.get(0).shortName !== "zz")
-            }
-            ComboBox {
-                id: layoutBox
-                model: keyboard.layouts; index: keyboard.currentLayout
-                width: parent.parent.width * 0.035
-                height: parent.height * 0.6
-                visible: keyboard.layouts.count > 1 && (keyboard.layouts.count === 0 || keyboard.layouts.get(0).shortName !== "zz")
-                color: base03; textColor: yellow; borderColor: "transparent"
-                hoverColor: base02; arrowColor: base03
-                onValueChanged: keyboard.currentLayout = id
-                Connections {
-                    target: keyboard
-                    function onCurrentLayoutChanged() { layoutBox.index = keyboard.currentLayout }
-                }
-                rowDelegate: Rectangle {
-                    color: "transparent"
-                    Text {
-                        anchors { margins: parent.width * 0.08; top: parent.top; bottom: parent.bottom }
-                        verticalAlignment: Text.AlignVCenter
-                        text: modelItem ? modelItem.modelData.shortName : ""
-                        font { family: fontFamily; pixelSize: smallFontSize }
-                        color: yellow
-                    }
-                }
-                KeyNavigation.backtab: session; KeyNavigation.tab: name
-            }
+        anchors {
+            top: parent.top
+            left: parent.left
+            right: parent.right
+            margins: parent.width * layout.componentMargin
         }
+        height: parent.height * layout.actionBarHeight
 
-        // Power buttons
-        Row {
-            anchors { right: parent.right; verticalCenter: parent.verticalCenter }
-            height: parent.height
-            spacing: parent.width * 0.01
+        theme: container.theme
+        layout: container.layout
+        themeRoot: container.themeRoot
 
-            ImageButton {
-                id: btnReboot
-                height: parent.height * 0.3
-                width: height
-                smooth: true
-                antialiasing: true
-                source: themeRoot + "Assets/reboot.svg"
-                visible: sddm.canReboot
-                onClicked: sddm.reboot()
-                KeyNavigation.backtab: loginButton; KeyNavigation.tab: btnShutdown
-            }
-
-            ImageButton {
-                id: btnShutdown
-                height: parent.height * 0.3
-                smooth: true
-                antialiasing: true
-                width: height
-                source: themeRoot + "Assets/shutdown.svg"
-                visible: sddm.canPowerOff
-                onClicked: sddm.powerOff()
-                KeyNavigation.backtab: btnReboot; KeyNavigation.tab: session
-            }
-        }
+        onFocusNext: container.focusNext()
+        onFocusPrevious: container.focusPrevious()
+        onRequestLoginFocus: loginForm.focusUsername()
     }
 
     // Main content area
     Item {
-        anchors { fill: parent; topMargin: actionBar.height }
+        anchors {
+            fill: parent
+            topMargin: actionBar.height + (parent.height * layout.componentMargin)
+        }
 
         // Right-side container for clock and login form
         Item {
             id: rightContainer
-            width: parent.width * 0.4
+            width: parent.width * layout.rightPanelWidth
             height: parent.height * 0.6
             anchors {
                 right: parent.right
                 bottom: parent.bottom
             }
 
-            // Clock
+            // Clock with error handling
             Clock {
                 id: sddmClock
                 width: parent.width
-                height: parent.height * 0.4
+                height: parent.height * layout.clockHeight
                 anchors {
                     top: parent.top
                     horizontalCenter: parent.horizontalCenter
                 }
                 timeFont {
-                    family: fontFamily
-                    pixelSize: clockFontSize
+                    family: theme.fonts.family
+                    pixelSize: theme.fonts.clock
                     bold: true
                 }
                 dateFont {
-                    family: fontFamily
-                    pixelSize: dateFontSize
+                    family: theme.fonts.family
+                    pixelSize: theme.fonts.date
                 }
-                color: base0
-
+                color: theme.colors.textColor
             }
 
-
-            // Login form - positioned below the clock
-            Rectangle {
+            // Login form
+            LoginForm {
+                id: loginForm
                 width: parent.width
-                height: parent.height * 0.5
+                height: parent.height * layout.loginFormHeight
                 anchors {
                     top: sddmClock.bottom
-                    topMargin: parent.height * 0.05
+                    topMargin: parent.height * layout.standardSpacing * layout.clockSpacingMultiplier
                     horizontalCenter: parent.horizontalCenter
                 }
-                color: "transparent"
-                clip: true
 
-                Row {
-                    anchors { fill: parent; margins: parent.width * 0.05 }
-                    spacing: parent.width * 0.05
+                theme: container.theme
+                layout: container.layout
+                themeRoot: container.themeRoot
 
-                    // Username column
-                    Column {
-                        width: (parent.width - parent.spacing) * 0.48
-                        spacing: parent.height * 0.08
-
-                        Text {
-                            text: textConstants.userName
-                            font {
-                                family: fontFamily
-                                bold: true
-                                pixelSize: normalFontSize
-                            }
-                            color: base0
-                        }
-
-                        TextBox {
-                            id: name
-                            width: parent.width
-                            height: parent.parent.height * 0.15
-                            text: userModel.lastUser
-                            font { family: fontFamily; pixelSize: normalFontSize }
-                            color: base02
-                            borderColor: "transparent"
-                            textColor: base0
-                            Keys.onPressed: function(event) {
-                                if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
-                                    sddm.login(name.text, password.text, session.index)
-                                    event.accepted = true
-                                }
-                            }
-                            KeyNavigation.backtab: layoutBox; KeyNavigation.tab: password
-                        }
-
-                        Text {
-                            id: errorMessage
-                            text: textConstants.prompt
-                            font {
-                                family: fontFamily
-                                pixelSize: smallFontSize
-                            }
-                            color: base0
-                            wrapMode: Text.WordWrap
-                            width: parent.width
-                        }
-                    }
-
-                    // Password column
-                    Column {
-                        width: (parent.width - parent.spacing) * 0.48
-                        spacing: parent.height * 0.08
-
-                        Text {
-                            text: textConstants.password
-                            font {
-                                family: fontFamily
-                                bold: true
-                                pixelSize: normalFontSize
-                            }
-                            color: base0
-                        }
-
-                        PasswordBox {
-                            id: password
-                            width: parent.width
-                            height: parent.parent.height * 0.15
-                            font { family: fontFamily; pixelSize: normalFontSize }
-                            tooltipBG: base02; tooltipFG: red
-                            image: themeRoot + "Assets/warning_red.png"
-                            color: base02
-                            borderColor: "transparent"
-                            textColor: base0
-                            Keys.onPressed: function(event) {
-                                if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
-                                    sddm.login(name.text, password.text, session.index)
-                                    event.accepted = true
-                                }
-                            }
-                            KeyNavigation.backtab: name; KeyNavigation.tab: loginButton
-                        }
-
-                        Button {
-                            id: loginButton
-                            text: textConstants.login
-                            width: parent.width * 0.7
-                            height: parent.parent.height * 0.16
-                            anchors.right: parent.right
-                            color: blue; disabledColor: red
-                            activeColor: blue; pressedColor: cyan
-                            textColor: base3
-                            font {
-                                family: fontFamily
-                                pixelSize: normalFontSize
-                            }
-                            onClicked: sddm.login(name.text, password.text, session.index)
-                            KeyNavigation.backtab: password; KeyNavigation.tab: btnReboot
-                        }
-                    }
+                onFocusNext: container.focusNext()
+                onFocusPrevious: container.focusPrevious()
+                onLoginAttempt: function(username, password, sessionIndex) {
+                    container.loginAttempt(username, password, sessionIndex)
+                    sddm.login(username, password, actionBar.getSessionIndex())
                 }
+                onRequestActionBarFocus: actionBar.focusSession()
             }
         }
     }
+
+    // Global key handling
+    Keys.onPressed: function(event) {
+        if (event.key === Qt.Key_Tab) {
+            focusNext()
+            event.accepted = true
+        } else if (event.key === Qt.Key_Backtab) {
+            focusPrevious()
+            event.accepted = true
+        }
+    }
+
+    focus: true
 }
