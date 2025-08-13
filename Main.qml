@@ -64,6 +64,7 @@ Rectangle {
     readonly property QtObject layout: QtObject {
         readonly property real actionBarHeight: 0.05        // 5% of screen height
         readonly property real rightPanelWidth: 0.4         // 40% of screen width
+        readonly property real rightPanelHeight: 0.6        // 60% of screen height
         readonly property real clockHeight: 0.4             // 40% of right panel
         readonly property real loginFormHeight: 0.5         // 50% of right panel
         readonly property real standardSpacing: 0.01        // Standard spacing unit
@@ -160,7 +161,7 @@ Rectangle {
         Item {
             id: rightContainer
             width: parent.width * layout.rightPanelWidth
-            height: parent.height * 0.6
+            height: parent.height * layout.rightPanelHeight
             anchors {
                 right: parent.right
                 bottom: parent.bottom
