@@ -69,7 +69,7 @@ For example, to change to Montserrat font:
 
 ```
 [General]
-background=Backgrounds/background.png
+background="background.png"
 displayFont="Montserrat"
 ```
 
@@ -89,13 +89,13 @@ To use any of them change the `theme.conf` file accordingly:
 
 ```
 [General]
-background=Backgrounds/bars_background.png
+background="bars_background.png"
 ```
 or
 
 ```
 [General]
-background=Backgrounds/circles_background.png
+background="circles_background.png"
 ```
 
 ## License

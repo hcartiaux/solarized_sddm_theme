@@ -91,6 +91,7 @@ Rectangle {
     LayoutMirroring.childrenInherit: true
 
     property string themeRoot: Qt.resolvedUrl(".")
+    property string backgroundsPath: Qt.resolvedUrl("Backgrounds/")
 
     // Font sizing system
     property real scaleFactor: Math.min(width / 1024, height / 768)
@@ -117,15 +118,15 @@ Rectangle {
             width: geometry.width; height: geometry.height
             source: {
                 if (config.background && Qt.resolvedUrl(config.background).toString() !== "")
-                    return container.themeRoot + config.background
-                return container.themeRoot + "Backgrounds/background.png"
+                    return container.backgroundsPath + config.background
+                return container.backgroundsPath + "background.png"
             }
             fillMode: Image.PreserveAspectCrop
             onStatusChanged: {
                 if (status === Image.Error) {
                     console.warn("Failed to load background image:", source)
-                    if (source !== container.themeRoot + "Backgrounds/background.png") {
-                        source = container.themeRoot + "Backgrounds/background.png"
+                    if (source !== container.backgroundsPath + "background.png") {
+                        source = container.backgroundsPath + "background.png"
                     }
                 }
             }
