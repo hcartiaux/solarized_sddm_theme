@@ -45,12 +45,12 @@ package contains the latest stable version.
 > distributions like Fedora or Ubuntu, but use it at your own risk.
 
 To install on other Linux distributions, you must get the latest stable version
-from [GitHub](https://github.com/MalditoBarbudo/solarized_sddm_theme/releases)
-(`0.1.8` at the time of writing):
+from [GitHub](https://github.com/hcartiaux/solarized_sddm_theme/tags)
+(`v0.2.0` at the time of writing):
 
 ```
 # this command will download and untar the package
-wget --no-check-certificate https://github.com/MalditoBarbudo/solarized_sddm_theme/archive/0.1.6.tar.gz -O - | tar xz
+wget https://github.com/hcartiaux/solarized_sddm_theme/archive/refs/tags/v0.2.0.tar.gz -O - | tar xz
 ```
 
 Then copy the created theme folder to `/usr/share/sddm/themes`.
