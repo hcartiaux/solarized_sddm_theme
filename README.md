@@ -83,7 +83,7 @@ But be careful, some fonts don't mix well with the theme.
 
 ## Screenshot (2019-01-03)
 
-![screenshot](solarized_sddm_theme.png)
+![screenshot](Previews/solarized_sddm_theme.png)
 
 ## Former backgrounds
 
