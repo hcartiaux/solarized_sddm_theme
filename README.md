@@ -75,7 +75,7 @@ For example, to change to Montserrat font:
 
 ```
 [General]
-background=background.png
+background=Backgrounds/background.png
 displayFont="Montserrat"
 ```
 
@@ -84,6 +84,25 @@ But be careful, some fonts don't mix well with the theme.
 ## Screenshot (2019-01-03)
 
 ![screenshot](solarized_sddm_theme.png)
+
+## Former backgrounds
+
+With version 0.1.8 a new default background was introduced (`ridges`). If you
+prefer the former backgrounds (`bars`, `circles` or `traces`) you can find them
+in the theme folder as `bars_background.png`, `circles_background.png` and
+`traces_background.png`.
+To use any of them change the `theme.conf` file accordingly:
+
+```
+[General]
+background=Backgrounds/bars_background.png
+```
+or
+
+```
+[General]
+background=Backgrounds/circles_background.png
+```
 
 ## License
 
