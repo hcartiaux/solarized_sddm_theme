@@ -95,11 +95,7 @@ Rectangle {
     property real scaleFactor: Math.min(width / 1024, height / 768)
     readonly property int baseFontSize: 12
 
-    // Navigation management
-    property Item currentFocusItem: null
-
-    signal focusNext()
-    signal focusPrevious()
+    // Navigation management - simplified focus handling
     signal loginAttempt(string username, string password, int sessionIndex)
 
     TextConstants { id: textConstants }
@@ -150,9 +146,7 @@ Rectangle {
         layout: container.layout
         themeRoot: container.themeRoot
 
-        onFocusNext: container.focusNext()
-        onFocusPrevious: container.focusPrevious()
-        onRequestLoginFocus: loginForm.focusUsername()
+        onRequestLoginFocus: loginForm.focusInitial()
     }
 
     // Main content area
@@ -208,8 +202,7 @@ Rectangle {
                 layout: container.layout
                 themeRoot: container.themeRoot
 
-                onFocusNext: container.focusNext()
-                onFocusPrevious: container.focusPrevious()
+                onFocusNext: actionBar.focusSession()
                 onLoginAttempt: function(username, password, sessionIndex) {
                     container.loginAttempt(username, password, sessionIndex)
                     sddm.login(username, password, actionBar.getSessionIndex())
@@ -219,15 +212,10 @@ Rectangle {
         }
     }
 
-    // Global key handling
-    Keys.onPressed: function(event) {
-        if (event.key === Qt.Key_Tab) {
-            focusNext()
-            event.accepted = true
-        } else if (event.key === Qt.Key_Backtab) {
-            focusPrevious()
-            event.accepted = true
-        }
+    // Component initialization
+    Component.onCompleted: {
+        // Set initial focus based on username presence
+        loginForm.focusInitial()
     }
 
     focus: true

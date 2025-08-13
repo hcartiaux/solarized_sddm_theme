@@ -21,6 +21,15 @@ Rectangle {
         name.forceActiveFocus()
     }
 
+    function focusInitial() {
+        // Focus password if username is already set, otherwise username
+        if (name.text !== "") {
+            password.forceActiveFocus()
+        } else {
+            name.forceActiveFocus()
+        }
+    }
+
     function showError(message) {
         errorMessage.text = message
         errorMessage.color = theme.colors.warning
@@ -29,6 +38,40 @@ Rectangle {
     function clearError() {
         errorMessage.text = textConstants.prompt
         errorMessage.color = theme.colors.textColor
+    }
+
+    // Focus order: username -> password -> login button
+    property var focusOrder: [name, password, loginButton]
+
+    function focusNextInOrder() {
+        var currentIndex = getCurrentFocusIndex()
+        var nextIndex = (currentIndex + 1) % focusOrder.length
+
+        // If we're at the last item, signal to move to next component
+        if (currentIndex === focusOrder.length - 1) {
+            root.focusNext()
+        } else {
+            focusOrder[nextIndex].forceActiveFocus()
+        }
+    }
+
+    function focusPreviousInOrder() {
+        var currentIndex = getCurrentFocusIndex()
+        if (currentIndex === 0) {
+            // Signal to move to previous component (action bar)
+            root.requestActionBarFocus()
+        } else {
+            focusOrder[currentIndex - 1].forceActiveFocus()
+        }
+    }
+
+    function getCurrentFocusIndex() {
+        for (var i = 0; i < focusOrder.length; i++) {
+            if (focusOrder[i].activeFocus) {
+                return i
+            }
+        }
+        return 0 // Default to first item
     }
 
     color: "transparent"
@@ -80,13 +123,15 @@ Rectangle {
                         root.loginAttempt(name.text, password.text, sessionModel.lastIndex)
                         event.accepted = true
                     } else if (event.key === Qt.Key_Tab) {
-                        password.forceActiveFocus()
+                        root.focusNextInOrder()
                         event.accepted = true
                     } else if (event.key === Qt.Key_Backtab) {
-                        root.requestActionBarFocus()
+                        root.focusPreviousInOrder()
                         event.accepted = true
                     }
                 }
+
+                onTextChanged: root.clearError()
             }
 
             Text {
@@ -146,16 +191,15 @@ Rectangle {
                         root.loginAttempt(name.text, password.text, sessionModel.lastIndex)
                         event.accepted = true
                     } else if (event.key === Qt.Key_Tab) {
-                        loginButton.forceActiveFocus()
+                        root.focusNextInOrder()
                         event.accepted = true
                     } else if (event.key === Qt.Key_Backtab) {
-                        name.forceActiveFocus()
+                        root.focusPreviousInOrder()
                         event.accepted = true
                     }
                 }
 
                 onTextChanged: root.clearError()
-
             }
 
             Button {
@@ -189,10 +233,10 @@ Rectangle {
                         root.loginAttempt(name.text, password.text, sessionModel.lastIndex)
                         event.accepted = true
                     } else if (event.key === Qt.Key_Tab) {
-                        root.focusNext()
+                        root.focusNextInOrder()
                         event.accepted = true
                     } else if (event.key === Qt.Key_Backtab) {
-                        password.forceActiveFocus()
+                        root.focusPreviousInOrder()
                         event.accepted = true
                     }
                 }
@@ -209,11 +253,7 @@ Rectangle {
 
     // Component initialization
     Component.onCompleted: {
-        // Set initial focus to username if it's empty, otherwise password
-        if (name.text === "") {
-            name.forceActiveFocus()
-        } else {
-            password.forceActiveFocus()
-        }
+        // Focus password if username is already set, otherwise username
+        focusInitial()
     }
 }

@@ -24,6 +24,52 @@ Rectangle {
         return session.index
     }
 
+    // Focus order management - left to right, top to bottom
+    property var focusOrder: {
+        var order = [session]
+        if (layoutBox.visible) {
+            order.push(layoutBox)
+        }
+        if (btnReboot.visible) {
+            order.push(btnReboot)
+        }
+        if (btnShutdown.visible) {
+            order.push(btnShutdown)
+        }
+        return order
+    }
+
+    function focusNextInOrder() {
+        var currentIndex = getCurrentFocusIndex()
+        var nextIndex = (currentIndex + 1) % focusOrder.length
+
+        // If we're at the last item, signal to move to login form
+        if (currentIndex === focusOrder.length - 1) {
+            root.requestLoginFocus()
+        } else {
+            focusOrder[nextIndex].forceActiveFocus()
+        }
+    }
+
+    function focusPreviousInOrder() {
+        var currentIndex = getCurrentFocusIndex()
+        if (currentIndex === 0) {
+            // Focus last item in action bar
+            focusOrder[focusOrder.length - 1].forceActiveFocus()
+        } else {
+            focusOrder[currentIndex - 1].forceActiveFocus()
+        }
+    }
+
+    function getCurrentFocusIndex() {
+        for (var i = 0; i < focusOrder.length; i++) {
+            if (focusOrder[i].activeFocus) {
+                return i
+            }
+        }
+        return 0 // Default to first item
+    }
+
     color: "transparent"
 
     Row {
@@ -69,14 +115,10 @@ Rectangle {
 
             // Navigation
             Keys.onTabPressed: function() {
-                if (layoutBox.visible) {
-                    layoutBox.forceActiveFocus()
-                } else {
-                    root.requestLoginFocus()
-                }
+                root.focusNextInOrder()
             }
             Keys.onBacktabPressed: function() {
-                btnShutdown.forceActiveFocus()
+                root.focusPreviousInOrder()
             }
         }
 
@@ -137,10 +179,10 @@ Rectangle {
 
             // Navigation
             Keys.onTabPressed: function() {
-                root.requestLoginFocus()
+                root.focusNextInOrder()
             }
             Keys.onBacktabPressed: function() {
-                session.forceActiveFocus()
+                root.focusPreviousInOrder()
             }
         }
     }
@@ -171,10 +213,10 @@ Rectangle {
 
             // Navigation
             Keys.onTabPressed: function() {
-                btnShutdown.forceActiveFocus()
+                root.focusNextInOrder()
             }
             Keys.onBacktabPressed: function() {
-                root.focusPrevious()
+                root.focusPreviousInOrder()
             }
 
             // Error handling
@@ -201,10 +243,10 @@ Rectangle {
 
             // Navigation
             Keys.onTabPressed: function() {
-                session.forceActiveFocus()
+                root.focusNextInOrder()
             }
             Keys.onBacktabPressed: function() {
-                btnReboot.forceActiveFocus()
+                root.focusPreviousInOrder()
             }
 
             // Error handling
