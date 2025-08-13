@@ -117,7 +117,7 @@ Rectangle {
             width: geometry.width; height: geometry.height
             source: {
                 if (config.background && Qt.resolvedUrl(config.background).toString() !== "")
-                    return config.background
+                    return container.themeRoot + config.background
                 return container.themeRoot + "Backgrounds/background.png"
             }
             fillMode: Image.PreserveAspectCrop
