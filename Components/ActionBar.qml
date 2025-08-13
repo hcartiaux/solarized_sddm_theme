@@ -54,8 +54,7 @@ Rectangle {
     function focusPreviousInOrder() {
         var currentIndex = getCurrentFocusIndex()
         if (currentIndex === 0) {
-            // Focus last item in action bar
-            focusOrder[focusOrder.length - 1].forceActiveFocus()
+            root.requestLoginFocus()
         } else {
             focusOrder[currentIndex - 1].forceActiveFocus()
         }

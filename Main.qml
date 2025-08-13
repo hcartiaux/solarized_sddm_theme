@@ -148,7 +148,13 @@ Rectangle {
         layout: container.layout
         themeRoot: container.themeRoot
 
-        onRequestLoginFocus: loginForm.focusInitial()
+        onRequestLoginFocus: loginForm.focusNonInitial()
+        // Component initialization
+        Component.onCompleted: {
+            // Set initial focus based on username presence
+            loginForm.focusInitial()
+        }
+
     }
 
     // Main content area
@@ -212,12 +218,6 @@ Rectangle {
                 onRequestActionBarFocus: actionBar.focusSession()
             }
         }
-    }
-
-    // Component initialization
-    Component.onCompleted: {
-        // Set initial focus based on username presence
-        loginForm.focusInitial()
     }
 
     focus: true

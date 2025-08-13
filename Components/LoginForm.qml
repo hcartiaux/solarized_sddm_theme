@@ -29,6 +29,11 @@ Rectangle {
             name.forceActiveFocus()
         }
     }
+    function focusNonInitial() {
+        // Focus on username
+        name.forceActiveFocus()
+    }
+
 
     function showError(message) {
         errorMessage.text = message
