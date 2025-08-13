@@ -22,13 +22,6 @@ the Solarized palette by Ethan Schoonover
 
 I use these colors almost everywhere, so why not in the greeter? ;)
 
-## Dependencies
-
-This theme relies on the `FontAwesome` font. If you try this, make sure it is
-installed on your system. On Arch Linux, this font can be installed from the AUR:
-
-* [ttf-font-awesome](https://aur.archlinux.org/packages/ttf-font-awesome)
-
 ## Installation
 
 ### Stable version
@@ -50,7 +43,7 @@ from [GitHub](https://github.com/hcartiaux/solarized_sddm_theme/tags)
 
 ```
 # this command will download and untar the package
-wget https://github.com/hcartiaux/solarized_sddm_theme/archive/refs/tags/v0.2.0.tar.gz -O - | tar xz
+wget https://github.com/hcartiaux/solarized_sddm_theme/archive/refs/tags/v0.2.2.tar.gz -O - | tar xz
 ```
 
 Then copy the created theme folder to `/usr/share/sddm/themes`.
