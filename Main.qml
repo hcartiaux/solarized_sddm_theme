@@ -50,7 +50,7 @@ Rectangle {
         }
 
         readonly property QtObject fonts: QtObject {
-            property string family: config.displayFont || textFont.name
+            property string family: config.displayFont
             property int small:  Math.max(10, baseFontSize * scaleFactor * 0.8)
             property int normal: Math.max(12, baseFontSize * scaleFactor)
             property int large:  Math.max(16, baseFontSize * scaleFactor * 1.2)
@@ -103,22 +103,6 @@ Rectangle {
     signal loginAttempt(string username, string password, int sessionIndex)
 
     TextConstants { id: textConstants }
-
-    FontLoader {
-        id: textFont
-        source: {
-            if (config.displayFont) {
-                return config.displayFont.includes('/') ?
-                    config.displayFont : themeRoot + config.displayFont + ".ttf"
-            }
-            return themeRoot + "DejaVuSans.ttf"
-        }
-        onStatusChanged: {
-            if (status === FontLoader.Error) {
-                console.warn("Failed to load custom font, using system default")
-            }
-        }
-    }
 
     // Global error handling for login
     Connections {
