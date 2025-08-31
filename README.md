@@ -40,11 +40,11 @@ package contains the latest stable version.
 
 To install on other Linux distributions, you must get the latest stable version
 from [GitHub](https://github.com/hcartiaux/solarized_sddm_theme/tags)
-(`v0.2.0` at the time of writing):
+(`v0.3.0` at the time of writing):
 
-```
+```bash
 # this command will download and untar the package
-wget https://github.com/hcartiaux/solarized_sddm_theme/archive/refs/tags/v0.2.2.tar.gz -O - | tar xz
+wget https://github.com/hcartiaux/solarized_sddm_theme/archive/refs/tags/v0.3.0.tar.gz -O - | tar xz
 ```
 
 Then copy the created theme folder to `/usr/share/sddm/themes`.
@@ -60,7 +60,7 @@ the default `SDDM` font is used. `Raleway` can be installed on Arch Linux from t
   [ttf-google-fonts-git](https://aur.archlinux.org/packages/ttf-google-fonts-git/),
   which also installs other cool fonts.
 
-#### Changing font in `theme.conf`:
+### Changing font in `theme.conf`
 
 If you want to try different fonts, use your favorite font, or just specify one
 that is installed on your system, you can modify the `displayFont` field in the
